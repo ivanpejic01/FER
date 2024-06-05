@@ -1,0 +1,130 @@
+﻿@model WebApp.ViewModels.MjestaViewModel
+
+@{
+    ViewData["Title"] = "Mjesta";
+}
+
+<style>
+    body {
+        background-image: url('https://coolbackgrounds.io/images/backgrounds/index/ranger-4df6c1b6.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    img {
+        border-radius: 10px;
+    }
+
+    a {
+        color: green;
+        text-decoration: none;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 4 stupca */
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .grid-item {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .fade-out {
+        animation: fadeOut ease 2s;
+        animation-fill-mode: forwards; 
+    }
+
+    @@keyframes fadeOut {
+        0% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+
+</style>
+
+<body>
+  
+
+    <h1>Mjesta</h1>
+    <div class="alert-container">
+        @if (TempData.ContainsKey(Constants.Message))
+        {
+            <div id="alert-message" class="alert alert-@((bool)TempData[Constants.ErrorOccurred] ? "danger" : "success")">
+                @TempData[Constants.Message]
+            </div>
+        }
+    </div>
+
+    <form method="get" action="@Url.Action("Search", "Mjesto")">
+        <label>Pretraži po imenu mjesta:</label>
+        <input type="text" name="naziv" style="border-radius: 5px; padding: 5px; border: 1px solid #ccc; outline: none;" />
+        <button class ="btn btn-sm btn-success" type="submit">Pretraži</button>
+    </form>
+
+
+    <div class="grid-container">
+
+        @foreach (var mjesto in Model.mjesta)
+        {
+            <div class="grid-item">
+                <h3>@mjesto.naziv</h3>
+                <p><strong>Poštanski broj: </strong> @mjesto.postanskibroj</p>
+                <td class="btn-group">
+                    <div class="btn-group">
+                        <a asp-action="Edit"
+                           asp-route-idMjesta="@mjesto.idMjesto"
+                           class="btn btn-sm btn-success" title="Ažuriraj"><i class="fas fa-edit"></i>Ažuriraj</a>
+                        &nbsp;&nbsp;&nbsp;
+                        <form asp-action="Delete" method="post" asp-route-idMjesta="@mjesto.idMjesto">
+                            <input type="hidden" name="idMjesto" value="@mjesto.idMjesto" />
+                            <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši" onclick="return confirmDelete()"><i class="fas fa-trash-alt"></i>Obriši</button>
+                        </form>
+                    </div>
+
+                    <script>
+                        function confirmDelete() {
+                            return confirm('Jeste li sigurni da želite obrisati?');
+                        }
+                    </script>
+                </td>
+
+           
+
+            </div>
+        }
+    </div>
+
+    <a asp-action="Create" class="btn btn-sm btn-success">Dodaj mjesto</a>
+
+    <script>
+        var alertMessage = document.getElementById('alert-message');
+        if (alertMessage) {
+            setTimeout(function () {
+                alertMessage.classList.add('fade-out');
+            }, 3000); 
+        }
+    </script>
+
+    @*<a asp-action="Index" class="btn btn-sm btn-success">Makni filter pretraživanja</a>*@
+
+    <div style="text-align: center;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/1200px-Google_Maps_pin.svg.png" width="120" height="200" />
+    </div>
+</body>
